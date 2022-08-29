@@ -21,8 +21,9 @@ I hope somebody else might find this useful, and make the book much easier to us
 
 ## The final result
 
-The final results are PDF files. For convinience they are attached in the 'release' section of this
-repository. There are effectively two useful PDFs:
+The final results are PDF files. For convinience they are attached in the
+['Releases'](https://github.com/grahamwhaley/vegetariano_index/releases) section of this repository.
+There are effectively two useful PDFs:
 
 | Name | Description |
 | ------ | ------ |
@@ -36,7 +37,9 @@ booklet you can keep alongside your book. You need to print it double sided on a
 ## Sample
 
 Below is a sample of how the index looks. This is taken from one page of the booklet form, so shows
-two non-consecutive pages, which works out once the booklet is folded together.
+two non-consecutive pages, which works out once the booklet is folded together. If you want the full
+files, you need to look in the [Releases](https://github.com/grahamwhaley/vegetariano_index/releases)
+area.
 
 ![Sample](./images/index_example.png)
 
