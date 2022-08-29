@@ -1,0 +1,42 @@
+% Fake up the vegetariano index into its own PDF.
+% This is a mild hack, as we need to *not* call makeindex in any form, but then it seems
+% rather hard to get printindex to pull in the vegetariano index file.
+% We end up using splitindex, and then copying the vegetariano index file over
+% in place.... see the Makefile as well.
+\documentclass{book}
+
+\title{%
+  Vegetariano Index \\
+  \medskip \small A supplementary Index by Ingredients for the book \\
+  'Vegetariano - 400 Regional Italian Recipes' \\
+}
+
+\author{Graham Whaley}
+
+\usepackage[splitindex]{imakeidx}
+% We need to call at least one makeindex to initialise the index system - we then never
+% invoke this 'index' index, but slide the vegetariano one in its place.
+\makeindex[name=index, columns=2]
+% Choosing a size really depends on how you are going to print this, and affects how many
+% pages the index takes.
+% For an A5 booklet print, if we don't mind sacrificing 2 pages from 12 to 14, then 'normalsize'
+% makes things slightly more readable
+%\indexsetup{othercode=\footnotesize}
+%\indexsetup{othercode=\small}
+\indexsetup{othercode=\normalsize}
+
+% Reduce the default margins of the A4 document. Our recipie names are very long, and
+% the margins in the physical book itself are more like the below. This not only makes
+% the index more readable on the page, but also allows us to squeeze it into fewer pages.
+\usepackage[a4paper,left=2cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+
+\begin{document}
+
+\maketitle{}
+
+% The last page of the book is 448, so let's fake the index to start on page 449...
+\setcounter{page}{449}
+
+\printindex{vegetariano}{Index}
+\end{document}
+

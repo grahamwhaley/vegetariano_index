@@ -1,0 +1,130 @@
+% This is the 'temporary' scratch document that is the first step in generating
+% the index for the Vegetariano book.
+%
+% This scratch document generates a file that includes all the 'temporary workings' of the
+% process including snippets all the sections, recipe titles and ingredients. By itself it
+% is not really that useful, but can be used to track down 'bugs' and review the index that
+% is generated.
+%
+% Really it is a stepping stone to then generate a standalone index, and then a booklet form
+% index for printing.
+%
+% What this document does contain is all the special commands we use to construct the index
+% from notes of the sections, titles and ingredients of the recipes.
+
+\documentclass[12pt,a4paper]{book}
+
+%\title{Vegetariano Index}
+%\author{Graham Whaley}
+
+% %define our default ingredients list layout
+% % Note the nasty hbadness stuff.  As we are cutting the ingredients to two columns,
+% % we get some underfull box warnings in 12pt, so this stops them appearing.
+% \def\beginingredientslist{\begin{multicols}{2} \hbadness=10000 \begin{itemize}}
+% \def\endingredientslist{\end{itemize} \hbadness=1000 \end{multicols}}
+
+% Later we may want to adjust this to be 4 columns of tiny font - but whilst deveoping it is
+% easier to view as 2 columns of scriptsize
+\usepackage[makeindex]{imakeidx}
+\indexsetup{othercode=\scriptsize}
+\makeindex[columns=2]
+
+% We spit out the actual arguments as text as well as adding them to the index as then in the 'raw'
+% document we get actual pages-per-recipe. If we did not then \newpage would effectively get ignored
+% and everything would end up on the first, blank, page. We can probably do this 'better' if we force
+% a newpage in the actual body of the text, but it's sort of useful to have the ingredients and stuff
+% dumped out in the raw text file to aid debug - and it's easy. This will only become a problem if
+% an ingredient list overflows a pagefull, which I think is doubtful (and if it does, we can probably
+% fix that later by squishing into a paragraph, or forcing page numbers if we have to. Page numbers
+% buried in the body text might be useful later anyway
+
+% Use special commands as variables to carry around the current category and recipe names so we can
+% use them with ! separators in the indexing of recipes and ingredients.
+\newcommand{\Vcurrentcategory}{xxx}
+\def\category #1{\hfill \break #1: \index{#1} \renewcommand{\Vcurrentcategory}{#1}}
+
+\newcommand{\Vcurrentrecipe}{xxx}
+\def\recipe #1{\hfill \break #1: \index{#1} \index{\Vcurrentcategory!#1} \renewcommand{\Vcurrentrecipe}{#1}}
+
+% Try to cater for multi-page recipes (of which there are so far few...)
+% This works in that the main recipe title and section references cover multi-pages, but the
+% ingredients still only show the first page. It seems not quite trivial to fix that. I tried
+% putting the recipestop() before the ingredients, but that still didn't seem to do it. It's not
+% a big problem though.
+\def\recipestart #1{\hfill \break #1: \index{#1|(} \index{\Vcurrentcategory!#1|(} \renewcommand{\Vcurrentrecipe}{#1}}
+\def\recipestop #1{ \index{#1|)} \index{\Vcurrentcategory!#1|)} }
+
+% I find it slightly odd that the 'see' cross references don't carry page numbers, but it seems that
+% is some sort of 'standard' in indexes, and it is not quite trivial to fix with the default \see
+% operation. We'll leave it as be for now.
+% Ingredient refs don't carry a photo bold ref either
+\def\italianrecipe #1{\hfill \break #1: \index{#1@\textsl{#1}|see {\Vcurrentrecipe}} }
+
+% 'altsort' lets us set the sort place in the index for oddly named recipes, such as the pasta
+% beggining with "'O Sicchio", which otherwise ends up at the front of the index
+% Order of arguments: {Real Name}{Sort Name}
+\def\italianrecipealtsort #1#2{\hfill \break #1: \index{#2@\textsl{#1}|see {\Vcurrentrecipe}} }
+\def\photo #1{\hfill \break #1: \index{#1|textbf} \index{\Vcurrentcategory!#1|textbf} }
+
+% Add a method to allow references to the current recipe - a bit like 'italianrecipe'. Very useful
+% when a recipe contains a hidden sub-recipe (such as how to make a sauce etc.). Do this as a def as
+% not only is it 'cleaner', but we need it to expand so we can process the index file later to make
+% the single index - outside of this main body text.
+% Warning - seems if we hard-code a \Vcurrentrecipe reference outside of a def then it will get
+% post-evaluated later, and pick up the wrong recipe name!
+\def\refcurrentrecipe #1{\hfill \break #1: \index{#1@\textsl{#1}|see {\Vcurrentrecipe}} }
+% Order of arguments: {Real Name}{Sort Name}
+\def\refcurrentrecipealtsort #1#2{\hfill \break #1: \index{#2@\textsl{#1}|see {\Vcurrentrecipe}} }
+
+% Later we may make use of the region, although the book itself does contain a region based index.
+% For now, insert the data into the file, but do nothing with it.
+\def\region #1{}
+
+\def\ingredient #1{#1 \index{#1!\Vcurrentrecipe}}
+
+% ingredient_redundant is used when an ingredient is correct, but really just adds duplication to
+% the index. For instance, if we have 'Apricot Dumplings' as the only recipe that uses 'Apricots'
+% as an ingredient, then the index looks like:
+%
+%  Apricot Dumplings, 384
+%  Apricots
+%    Apricot Dumplings, 384
+%
+% If we reduce that to the single direct recipe index entry (by dropping the Apricots as an ingredient)
+% then we lose nothing in the index (the recipe is still directly findable by looking for 'Apricots',
+% but we save 2 lines and make the index cleaner.
+%
+% This is mostly used when a recipe name starts with the name of an ingredient, and that recipe is
+% the only one to use that ingredient (or, possibly all recipes using that ingredient start with
+% the name of that ingredient). It may find other uses though. It is kept as a 'live' command so that
+% if somebody wishes to re-insert these lines they merely have to change the below command, and not
+% do a global search and replace.
+\def\ingredientredundant #1{#1}
+
+\def\vegan {\index{Vegan!\Vcurrentrecipe}}
+
+\begin{document}
+
+This is the first stage document used to build the index for the book 'Vegetariano'.
+
+
+\input{sections/seealso.tex}
+\input{sections/soups.tex}
+\input{sections/salads.tex}
+\input{sections/crostini.tex}
+\input{sections/pasta.tex}
+\input{sections/rice.tex}
+\input{sections/polenta.tex}
+\input{sections/legumes.tex}
+\input{sections/eggs.tex}
+\input{sections/pancakes.tex}
+\input{sections/pizzas.tex}
+\input{sections/casseroles.tex}
+\input{sections/sautes.tex}
+\input{sections/desserts.tex}
+
+% %%%%%%%%%%%%%%% END OF DOCUMENT %%%%%%%%%%%%%%%%%%
+
+\printindex
+\end{document}
+
